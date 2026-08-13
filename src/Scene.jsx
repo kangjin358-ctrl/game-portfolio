@@ -23,8 +23,6 @@ const growth = [
 
 const corridorDoors = [
   ...projects.map(project => ({ title:project.title, label:project.role, project })),
-  { title:"CREATIVE SPACE", label:"IDEAS & INSPIRATION", view:"creative" },
-  { title:"GROWTH TREE", label:"MY JOURNEY", view:"growth" },
   { title:"CONTACT", label:"LET'S CONNECT", view:"contact" },
 ]
 
@@ -111,7 +109,7 @@ export default function Scene() {
   const close = () => { setView(null); setProject(null) }
   return <main className="shell">
     <Canvas camera={{position:[0,0,5],fov:65}}><color attach="background" args={["#d8d2c7"]}/><Corridor paused={!!view}/>{!view&&<PointerLockControls/>}</Canvas>
-    <header><button className="brand" onClick={()=>open("about")}><strong>KANG JIN</strong><span>GAME DESIGN PORTFOLIO</span></button><nav>{["about","projects","creative","growth","contact"].map(x=><button key={x} onClick={()=>open(x)}>{x}</button>)}</nav></header>
+    <header><button className="brand" onClick={()=>open("about")}><strong>KANG JIN</strong><span>GAME DESIGN PORTFOLIO</span></button><nav>{["projects","contact"].map(x=><button key={x} onClick={()=>open(x)}>{x}</button>)}</nav></header>
     <div className="crosshair"/><div className="instructions"><b>CLICK TO EXPLORE</b><br/>WASD · MOVE&nbsp;&nbsp; MOUSE · LOOK&nbsp;&nbsp; ESC · RELEASE</div>
     <div className="dock">{corridorDoors.map((item,i)=><button key={item.title} onClick={()=>{setProject(item.project||null);setView(item.project?"project":item.view)}}><span>{String(i+1).padStart(2,"0")}</span>{item.title}</button>)}</div>
     {view&&<Panel view={view} project={project} close={close} select={p=>{setProject(p);setView(p?"project":"projects")}}/>}

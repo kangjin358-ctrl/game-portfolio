@@ -26,7 +26,10 @@ const corridorDoors = [
   { title:"CONTACT ME", label:"LET'S CONNECT", view:"contact" },
 ]
 
-function Movement({ paused }) {
+const WALL_COLOR = "#d9d3c8"
+const DOOR_Z = corridorDoors.map((_,i)=>2-i*5)
+
+function Movement({ paused, opened }) {
   const { camera } = useThree()
   const keys = useRef({})
   useEffect(() => {
@@ -40,12 +43,36 @@ function Movement({ paused }) {
     const f = new THREE.Vector3(), r = new THREE.Vector3()
     camera.getWorldDirection(f); f.y = 0; f.normalize()
     r.crossVectors(f, camera.up).normalize()
-    if (keys.current.KeyW) camera.position.addScaledVector(f, 4*dt)
-    if (keys.current.KeyS) camera.position.addScaledVector(f, -4*dt)
-    if (keys.current.KeyA) camera.position.addScaledVector(r, -4*dt)
-    if (keys.current.KeyD) camera.position.addScaledVector(r, 4*dt)
-    camera.position.x = THREE.MathUtils.clamp(camera.position.x,-12,12)
-    camera.position.z = THREE.MathUtils.clamp(camera.position.z,-18,5)
+    const move = new THREE.Vector3()
+    if (keys.current.KeyW) move.add(f)
+    if (keys.current.KeyS) move.sub(f)
+    if (keys.current.KeyA) move.sub(r)
+    if (keys.current.KeyD) move.add(r)
+    if (move.lengthSq()) move.normalize().multiplyScalar(4*dt)
+    const nextX = camera.position.x + move.x
+    const nextZ = THREE.MathUtils.clamp(camera.position.z + move.z,-20.5,5)
+    const insideCorridor = Math.abs(nextX) <= 4.05
+    const roomIndex = DOOR_Z.findIndex((z,i)=>{
+      const correctSide = i%2===0 ? nextX<0 : nextX>0
+      return correctSide && Math.abs(nextZ-z)<1.04 && opened[i]
+    })
+    if (insideCorridor || roomIndex!==-1) {
+      camera.position.x = THREE.MathUtils.clamp(nextX,-11.75,11.75)
+      camera.position.z = nextZ
+    } else if (Math.abs(camera.position.x)>4.05) {
+      const sideRoom = DOOR_Z.findIndex((z,i)=>{
+        const correctSide = i%2===0 ? camera.position.x<0 : camera.position.x>0
+        return correctSide && Math.abs(camera.position.z-z)<2.18
+      })
+      if (sideRoom!==-1) {
+        const z=DOOR_Z[sideRoom]
+        camera.position.x=THREE.MathUtils.clamp(nextX,camera.position.x<0?-11.75:4.08,camera.position.x<0?-4.08:11.75)
+        camera.position.z=THREE.MathUtils.clamp(nextZ,z-2.02,z+2.02)
+      }
+    } else {
+      camera.position.x=THREE.MathUtils.clamp(nextX,-3.98,3.98)
+      camera.position.z=nextZ
+    }
     camera.position.y = 0
   })
   return null
@@ -68,7 +95,6 @@ function Door({ item, index, open }) {
     if (pivot.current) pivot.current.rotation.y = THREE.MathUtils.damp(pivot.current.rotation.y,target,6,dt)
   })
   return <group position={[left?-4.58:4.58,-.2,z]} rotation={[0,left?Math.PI/2:-Math.PI/2,0]}>
-    <mesh position={[0,2.58,-.02]}><boxGeometry args={[3.15,1.18,.28]}/><meshStandardMaterial color="#d9d3c8"/></mesh>
     <mesh position={[-1.34,0,0]}><boxGeometry args={[.42,4.25,.28]}/><meshStandardMaterial color="#5d4633"/></mesh>
     <mesh position={[1.34,0,0]}><boxGeometry args={[.42,4.25,.28]}/><meshStandardMaterial color="#5d4633"/></mesh>
     <mesh position={[0,2.02,0]}><boxGeometry args={[3.1,.28,.28]}/><meshStandardMaterial color="#5d4633"/></mesh>
@@ -97,9 +123,9 @@ function ProjectRoom({ item,index }) {
   const theme=roomThemes[index]
   return <group>
     <mesh position={[centerX,-2,z]}><boxGeometry args={[7.4,.25,4.5]}/><meshStandardMaterial color={theme.floor}/></mesh>
-    <mesh position={[direction*12.05,.3,z]}><boxGeometry args={[.22,4.7,4.5]}/><meshStandardMaterial color={theme.wall}/></mesh>
-    <mesh position={[centerX,.3,z-2.25]}><boxGeometry args={[7.4,4.7,.22]}/><meshStandardMaterial color={theme.wall}/></mesh>
-    <mesh position={[centerX,.3,z+2.25]}><boxGeometry args={[7.4,4.7,.22]}/><meshStandardMaterial color={theme.wall}/></mesh>
+    <mesh position={[direction*12.05,.3,z]}><boxGeometry args={[.3,4.7,4.7]}/><meshStandardMaterial color={theme.wall}/></mesh>
+    <mesh position={[centerX,.3,z-2.25]}><boxGeometry args={[7.5,4.7,.3]}/><meshStandardMaterial color={theme.wall}/></mesh>
+    <mesh position={[centerX,.3,z+2.25]}><boxGeometry args={[7.5,4.7,.3]}/><meshStandardMaterial color={theme.wall}/></mesh>
     <mesh position={[centerX,2.65,z]}><boxGeometry args={[7.4,.18,4.5]}/><meshStandardMaterial color="#171716"/></mesh>
     <pointLight position={[centerX,1.7,z]} intensity={18} distance={8} color={theme.light}/>
     <Text position={[direction*11.85,.8,z]} rotation={[0,left?Math.PI/2:-Math.PI/2,0]} fontSize={.34} color="#f4eee4" maxWidth={3.2} textAlign="center">{theme.title}</Text>
@@ -108,12 +134,21 @@ function ProjectRoom({ item,index }) {
 }
 
 function SideWall({ left }) {
-  const doorZ = corridorDoors.map((_,i)=>(i%2===0)===left ? 2-i*5 : null).filter(v=>v!==null)
-  const panels=[]
-  for(let z=4;z>=-20;z-=1) {
-    if(!doorZ.some(d=>Math.abs(d-z)<1.35)) panels.push(z)
-  }
-  return <>{panels.map(z=><mesh key={z} position={[left?-4.75:4.75,.5,z]}><boxGeometry args={[.25,5,1.05]}/><meshStandardMaterial color="#d9d3c8"/></mesh>)}</>
+  const doorZ = DOOR_Z.filter((_,i)=>(i%2===0)===left).sort((a,b)=>a-b)
+  const edgeMin=-21, edgeMax=7, halfGap=1.55
+  const segments=[]
+  let cursor=edgeMin
+  doorZ.forEach(z=>{
+    const end=z-halfGap
+    if(end>cursor) segments.push([cursor,end])
+    cursor=z+halfGap
+  })
+  if(cursor<edgeMax) segments.push([cursor,edgeMax])
+  const x=left?-4.75:4.75
+  return <>
+    {segments.map(([start,end])=><mesh key={start} position={[x,.5,(start+end)/2]}><boxGeometry args={[.3,5,end-start+.02]}/><meshStandardMaterial color={WALL_COLOR}/></mesh>)}
+    {doorZ.map(z=><mesh key={`lintel-${z}`} position={[x,2.48,z]}><boxGeometry args={[.3,1.05,3.12]}/><meshStandardMaterial color={WALL_COLOR}/></mesh>)}
+  </>
 }
 
 function Corridor({ paused, onNear }) {
@@ -142,8 +177,8 @@ function Corridor({ paused, onNear }) {
   return <>
     <mesh position={[0,-2,-7]}><boxGeometry args={[9.5,.25,28]}/><meshStandardMaterial color="#a89478" roughness={.9}/></mesh>
     <SideWall left/><SideWall left={false}/>
-    <mesh position={[0,3,-7]}><boxGeometry args={[9.5,.25,28]}/><meshStandardMaterial color="#e9e5dc"/></mesh>
-    <mesh position={[0,.5,-21]}><boxGeometry args={[9.5,5,.25]}/><meshStandardMaterial color="#d3cdc2"/></mesh>
+    <mesh position={[0,3,-7]}><boxGeometry args={[9.8,.3,28.3]}/><meshStandardMaterial color={WALL_COLOR}/></mesh>
+    <mesh position={[0,.5,-21]}><boxGeometry args={[9.8,5,.3]}/><meshStandardMaterial color={WALL_COLOR}/></mesh>
     <mesh position={[0,.4,-20.82]}><boxGeometry args={[2.8,3.7,.05]}/><meshStandardMaterial color="#fff" emissive="#fff" emissiveIntensity={1.5}/></mesh>
     <mesh position={[-4.55,-1.7,-7]}><boxGeometry args={[.12,.25,28]}/><meshStandardMaterial color="#644b36"/></mesh>
     <mesh position={[4.55,-1.7,-7]}><boxGeometry args={[.12,.25,28]}/><meshStandardMaterial color="#644b36"/></mesh>
@@ -152,7 +187,7 @@ function Corridor({ paused, onNear }) {
     {corridorDoors.map((item,i)=><ProjectRoom key={item.title} item={item} index={i}/>)}
     <Text position={[0,1.05,-20.65]} fontSize={.24} color="#4b443c">KEEP EXPLORING</Text>
     <ambientLight intensity={1.7}/><directionalLight position={[0,6,5]} intensity={1.7} color="#fff5df"/>
-    <Movement paused={paused}/>
+    <Movement paused={paused} opened={opened}/>
   </>
 }
 

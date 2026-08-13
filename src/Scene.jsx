@@ -1,424 +1,100 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { PointerLockControls, Text } from "@react-three/drei"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import * as THREE from "three"
 
-const MOVE_SPEED = 4
+const projects = [
+  { title:"DOG OF WAR", subtitle:"Jerky Dog Simulator", role:"Level Designer", tools:"Unity · Level Design · Playtesting", date:"2026", summary:"A short, chaotic exploration game set on a WWII island. I designed the jungle, military camp and open plain, then reduced the map through playtesting to keep the experience within 5–10 minutes.", points:["Three-zone island layout","Movement-skill tutorial spaces","Multiple endings and exploration routes"] },
+  { title:"GRAVITY ANCHOR", subtitle:"Two-player Physics Platformer", role:"Game & Level Designer", tools:"Unity · C# · 2D Physics", date:"2026", summary:"A local co-op platformer where two magnetic spirits switch polarity to attract, repel and activate gravity anchors across collaborative levels.", points:["Co-op magnetic interaction","Physics-based puzzles","Dungeon, ground and sky progression"] },
+  { title:"ELEMENT FRONT", subtitle:"AR Element Strategy Game", role:"Game Designer & Programmer", tools:"Unity 2022 · C# · AR", date:"2026", summary:"An AR tactical battle game built around fire, water and wood counters. Scanning cards creates units and battlefields, while elemental terrain rewards deliberate placement.", points:["Five tactical battle maps","10×10 placement grid","Element counters and terrain bonuses"] },
+  { title:"TIME COLLECTOR", subtitle:"Auction & Bluffing Board Game", role:"Game & System Designer", tools:"Tabletop Prototyping · Figma · Playtesting", date:"2026", summary:"A 3–4 player auction game about collecting antiques with hidden authenticity. Players inspect, bluff, pawn and bid while pursuing sets, trends and secret identities.", points:["Hidden-value auction system","24 antiques across four collections","Economy refined through playtests"] },
+  { title:"THE CORRIDOR", subtitle:"Psychological Horror UI", role:"UI/UX & Game Designer", tools:"Unreal Engine 5 · Blueprint · Figma", date:"2025–2026", summary:"A psychological horror prototype set in a monastery-like corridor. I designed an understated HUD, radial inventory and environmental guidance for a tense, readable experience.", points:["Heartbeat health feedback","Five-slot radial inventory","Environmental interaction guidance"] },
+]
 
-function PlayerMovement() {
+function Movement({ paused }) {
   const { camera } = useThree()
   const keys = useRef({})
-
   useEffect(() => {
-    const keyDown = (e) => {
-      keys.current[e.code] = true
-    }
-
-    const keyUp = (e) => {
-      keys.current[e.code] = false
-    }
-
-    window.addEventListener("keydown", keyDown)
-    window.addEventListener("keyup", keyUp)
-
-    return () => {
-      window.removeEventListener("keydown", keyDown)
-      window.removeEventListener("keyup", keyUp)
-    }
+    const down = e => { keys.current[e.code] = true }
+    const up = e => { keys.current[e.code] = false }
+    addEventListener("keydown", down); addEventListener("keyup", up)
+    return () => { removeEventListener("keydown", down); removeEventListener("keyup", up) }
   }, [])
-
-  useFrame((_, delta) => {
-    const forward = new THREE.Vector3()
-    const right = new THREE.Vector3()
-
-    camera.getWorldDirection(forward)
-
-    forward.y = 0
-    forward.normalize()
-
-    right.crossVectors(forward, camera.up).normalize()
-
-    if (keys.current["KeyW"]) {
-      camera.position.addScaledVector(forward, MOVE_SPEED * delta)
-    }
-
-    if (keys.current["KeyS"]) {
-      camera.position.addScaledVector(forward, -MOVE_SPEED * delta)
-    }
-
-    if (keys.current["KeyA"]) {
-      camera.position.addScaledVector(right, -MOVE_SPEED * delta)
-    }
-
-    if (keys.current["KeyD"]) {
-      camera.position.addScaledVector(right, MOVE_SPEED * delta)
-    }
-
-    // 防止走出走廊
-    camera.position.x = THREE.MathUtils.clamp(
-      camera.position.x,
-      -3.8,
-      3.8
-    )
-
-    camera.position.z = THREE.MathUtils.clamp(
-      camera.position.z,
-      -18,
-      5
-    )
-
-    // 固定玩家高度
+  useFrame((_, dt) => {
+    if (paused) return
+    const f = new THREE.Vector3(), r = new THREE.Vector3()
+    camera.getWorldDirection(f); f.y = 0; f.normalize()
+    r.crossVectors(f, camera.up).normalize()
+    if (keys.current.KeyW) camera.position.addScaledVector(f, 4*dt)
+    if (keys.current.KeyS) camera.position.addScaledVector(f, -4*dt)
+    if (keys.current.KeyA) camera.position.addScaledVector(r, -4*dt)
+    if (keys.current.KeyD) camera.position.addScaledVector(r, 4*dt)
+    camera.position.x = THREE.MathUtils.clamp(camera.position.x,-3.8,3.8)
+    camera.position.z = THREE.MathUtils.clamp(camera.position.z,-18,5)
     camera.position.y = 0
   })
-
   return null
 }
 
-function CeilingLamp({ z }) {
-  return (
-    <group position={[0, 2.7, z]}>
-      {/* 黑色吊线 */}
-      <mesh position={[0, 0.28, 0]}>
-        <cylinderGeometry args={[0.025, 0.025, 0.6, 8]} />
-        <meshStandardMaterial color="#222222" />
-      </mesh>
-
-      {/* 灯罩 */}
-      <mesh position={[0, -0.08, 0]}>
-        <cylinderGeometry args={[0.45, 0.25, 0.28, 20]} />
-        <meshStandardMaterial color="#262626" />
-      </mesh>
-
-      {/* 灯泡 */}
-      <mesh position={[0, -0.23, 0]}>
-        <sphereGeometry args={[0.12, 16, 16]} />
-        <meshStandardMaterial
-          color="#fff0c4"
-          emissive="#ffd88a"
-          emissiveIntensity={3}
-        />
-      </mesh>
-
-      <pointLight
-        position={[0, -0.5, 0]}
-        intensity={18}
-        distance={8}
-        color="#ffd59a"
-      />
-    </group>
-  )
+function Lamp({ z }) {
+  return <group position={[0,2.7,z]}>
+    <mesh position={[0,.28,0]}><cylinderGeometry args={[.025,.025,.6,8]}/><meshStandardMaterial color="#191919"/></mesh>
+    <mesh position={[0,-.08,0]}><cylinderGeometry args={[.45,.25,.28,20]}/><meshStandardMaterial color="#262626"/></mesh>
+    <mesh position={[0,-.23,0]}><sphereGeometry args={[.12,16,16]}/><meshStandardMaterial color="#fff0c4" emissive="#ffd88a" emissiveIntensity={3}/></mesh>
+    <pointLight position={[0,-.5,0]} intensity={17} distance={8} color="#ffd59a"/>
+  </group>
 }
 
-function WallSketch({ position, rotation, text }) {
-  return (
-    <group position={position} rotation={rotation}>
-      {/* 像贴在墙上的纸 */}
-      <mesh>
-        <boxGeometry args={[1.35, 1.1, 0.025]} />
-        <meshStandardMaterial color="#f7f3e8" />
-      </mesh>
-
-      <Text
-        position={[0, 0, 0.03]}
-        fontSize={0.14}
-        color="#393939"
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={1}
-        textAlign="center"
-      >
-        {text}
-      </Text>
-    </group>
-  )
+function Door({ project, index }) {
+  const left = index%2===0, z = 1-index*4.3
+  return <group position={[left?-4.58:4.58,-.2,z]} rotation={[0,left?Math.PI/2:-Math.PI/2,0]}>
+    <mesh><boxGeometry args={[2.45,4.15,.2]}/><meshStandardMaterial color="#73583f"/></mesh>
+    <mesh position={[0,0,.13]}><boxGeometry args={[2.08,3.75,.12]}/><meshStandardMaterial color={left?"#ded3bf":"#c9d1c8"} roughness={.9}/></mesh>
+    <mesh position={[0,1.45,.23]}><boxGeometry args={[1.75,.74,.07]}/><meshStandardMaterial color="#181716"/></mesh>
+    <Text position={[0,1.45,.28]} fontSize={.19} color="#f4ead7" maxWidth={1.55} textAlign="center">{project.title}</Text>
+    <Text position={[0,.35,.22]} fontSize={.13} color="#443d35" maxWidth={1.55} textAlign="center">{`${String(index+1).padStart(2,"0")}\n${project.role.toUpperCase()}`}</Text>
+    <mesh position={[.72,-.55,.25]}><sphereGeometry args={[.085,16,16]}/><meshStandardMaterial color="#282522" metalness={.55}/></mesh>
+  </group>
 }
 
-function Corridor() {
-  return (
-    <>
-      {/* 地板 */}
-      <mesh position={[0, -2, -7]}>
-        <boxGeometry args={[9.5, 0.25, 28]} />
-        <meshStandardMaterial
-          color="#d7c3a3"
-          roughness={0.85}
-        />
-      </mesh>
-
-      {/* 左墙 */}
-      <mesh position={[-4.75, 0.5, -7]}>
-        <boxGeometry args={[0.25, 5, 28]} />
-        <meshStandardMaterial
-          color="#eeeae1"
-          roughness={1}
-        />
-      </mesh>
-
-      {/* 右墙 */}
-      <mesh position={[4.75, 0.5, -7]}>
-        <boxGeometry args={[0.25, 5, 28]} />
-        <meshStandardMaterial
-          color="#eeeae1"
-          roughness={1}
-        />
-      </mesh>
-
-      {/* 天花板 */}
-      <mesh position={[0, 3, -7]}>
-        <boxGeometry args={[9.5, 0.25, 28]} />
-        <meshStandardMaterial color="#f4f1ea" />
-      </mesh>
-
-      {/* 尽头 */}
-      <mesh position={[0, 0.5, -21]}>
-        <boxGeometry args={[9.5, 5, 0.25]} />
-        <meshStandardMaterial color="#f1eee6" />
-      </mesh>
-
-      {/* 尽头的亮出口 */}
-      <mesh position={[0, 0.4, -20.82]}>
-        <boxGeometry args={[2.8, 3.7, 0.05]} />
-        <meshStandardMaterial
-          color="#ffffff"
-          emissive="#ffffff"
-          emissiveIntensity={1.6}
-        />
-      </mesh>
-
-      {/* 木质踢脚线 左 */}
-      <mesh position={[-4.55, -1.7, -7]}>
-        <boxGeometry args={[0.12, 0.25, 28]} />
-        <meshStandardMaterial color="#917456" />
-      </mesh>
-
-      {/* 木质踢脚线 右 */}
-      <mesh position={[4.55, -1.7, -7]}>
-        <boxGeometry args={[0.12, 0.25, 28]} />
-        <meshStandardMaterial color="#917456" />
-      </mesh>
-
-      {/* 顶灯 */}
-      <CeilingLamp z={2} />
-      <CeilingLamp z={-3} />
-      <CeilingLamp z={-8} />
-      <CeilingLamp z={-13} />
-      <CeilingLamp z={-18} />
-      <JerkyDogDoor />
-
-      {/* 左墙草图 */}
-      <WallSketch
-        position={[-4.58, 0.6, 2]}
-        rotation={[0, Math.PI / 2, 0]}
-        text={"LEVEL DESIGN\n\nBLOCKOUT\nPLAYER FLOW"}
-      />
-
-      <WallSketch
-        position={[-4.58, 0.6, -8]}
-        rotation={[0, Math.PI / 2, 0]}
-        text={"GAME SYSTEMS\n\nIDEA\nITERATION"}
-      />
-
-      {/* 右墙草图 */}
-      <WallSketch
-        position={[4.58, 0.6, -3]}
-        rotation={[0, -Math.PI / 2, 0]}
-        text={"PLAYTEST\n\nOBSERVE\nIMPROVE"}
-      />     
-
-      {/* 环境补光 */}
-      <ambientLight intensity={2.3} />
-
-      <directionalLight
-        position={[0, 6, 5]}
-        intensity={2}
-        color="#fff7e8"
-      />
-    </>
-  )
-}
-function JerkyDogDoor() {
-  return (
-    <group
-      position={[-4.58, -0.15, 1]}
-      rotation={[0, Math.PI / 2, 0]}
-      scale={0.88}
-    >
-      {/* 门框 */}
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[2.2, 4.1, 0.22]} />
-        <meshStandardMaterial color="#8a6848" />
-      </mesh>
-
-      {/* 门板 */}
-      <mesh position={[0, 0, 0.13]}>
-        <boxGeometry args={[1.8, 3.65, 0.12]} />
-        <meshStandardMaterial
-          color="#e8dfcf"
-          roughness={0.95}
-        />
-      </mesh>
-
-      {/* 门牌 */}
-      <mesh position={[0, 2.35, 0.08]}>
-        <boxGeometry args={[2.15, 0.65, 0.14]} />
-        <meshStandardMaterial color="#b88c5e" />
-      </mesh>
-
-      {/* 门牌文字 */}
-      <Text
-        position={[0, 2.35, 0.17]}
-        fontSize={0.26}
-        color="#28231f"
-        anchorX="center"
-        anchorY="middle"
-      >
-        DOG OF WAR
-      </Text>
-
-      {/* 临时狗狗图案 */}
-      <Text
-        position={[0, 0.6, 0.21]}
-        fontSize={0.5}
-        color="#37312b"
-        anchorX="center"
-        anchorY="middle"
-      >
-        DOG
-      </Text>
-
-      {/* 项目类型 */}
-      <Text
-        position={[0, -0.25, 0.21]}
-        fontSize={0.14}
-        color="#5c554d"
-        anchorX="center"
-        anchorY="middle"
-      >
-        LEVEL DESIGN
-        {"\n"}
-        EXPLORATION
-      </Text>
-
-      {/* 门把手 */}
-      <mesh position={[0.62, -0.4, 0.25]}>
-        <sphereGeometry args={[0.08, 16, 16]} />
-        <meshStandardMaterial
-          color="#3d3832"
-          metalness={0.4}
-        />
-      </mesh>
-
-      {/* 壁灯 */}
-      <group position={[1.35, 0.8, 0.1]}>
-        <mesh>
-          <boxGeometry args={[0.18, 0.55, 0.15]} />
-          <meshStandardMaterial color="#333333" />
-        </mesh>
-
-        <pointLight
-          position={[0, 0, 0.3]}
-          intensity={8}
-          distance={4}
-          color="#ffd49a"
-        />
-      </group>
-    </group>
-  )
-}
-function Scene() {
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: "100vh",
-        background: "#f2efe8",
-      }}
-    >
-      <Canvas
-        camera={{
-          position: [0, 0, 5],
-          fov: 65,
-        }}
-      >
-        <color attach="background" args={["#f2efe8"]} />
-
-        <Corridor />
-
-        <PlayerMovement />
-
-        <PointerLockControls />
-      </Canvas>
-
-      {/* 中间准星 */}
-      <div
-        style={{
-          position: "fixed",
-          left: "50%",
-          top: "50%",
-          width: "7px",
-          height: "7px",
-          border: "1px solid #333333",
-          borderRadius: "50%",
-          transform: "translate(-50%, -50%)",
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* 左上角名字 */}
-      <div
-        style={{
-          position: "fixed",
-          top: "28px",
-          left: "32px",
-          color: "#222222",
-          fontFamily: "Arial, sans-serif",
-          pointerEvents: "none",
-        }}
-      >
-        <div
-          style={{
-            fontSize: "26px",
-            fontWeight: "700",
-            letterSpacing: "2px",
-          }}
-        >
-          KANG JIN
-        </div>
-
-        <div
-          style={{
-            marginTop: "5px",
-            fontSize: "12px",
-            letterSpacing: "3px",
-            opacity: 0.6,
-          }}
-        >
-          GAME DESIGN PORTFOLIO
-        </div>
-      </div>
-
-      {/* 操作提示 */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "25px",
-          left: "32px",
-          color: "#333333",
-          fontSize: "12px",
-          fontFamily: "Arial, sans-serif",
-          lineHeight: "1.8",
-          opacity: 0.7,
-          pointerEvents: "none",
-        }}
-      >
-        WASD&nbsp;&nbsp; MOVE
-        <br />
-        MOUSE&nbsp;&nbsp; LOOK
-        <br />
-        ESC&nbsp;&nbsp; RELEASE
-      </div>
-    </div>
-  )
+function Corridor({ paused }) {
+  return <>
+    <mesh position={[0,-2,-7]}><boxGeometry args={[9.5,.25,28]}/><meshStandardMaterial color="#a89478" roughness={.9}/></mesh>
+    <mesh position={[-4.75,.5,-7]}><boxGeometry args={[.25,5,28]}/><meshStandardMaterial color="#d9d3c8"/></mesh>
+    <mesh position={[4.75,.5,-7]}><boxGeometry args={[.25,5,28]}/><meshStandardMaterial color="#d9d3c8"/></mesh>
+    <mesh position={[0,3,-7]}><boxGeometry args={[9.5,.25,28]}/><meshStandardMaterial color="#e9e5dc"/></mesh>
+    <mesh position={[0,.5,-21]}><boxGeometry args={[9.5,5,.25]}/><meshStandardMaterial color="#d3cdc2"/></mesh>
+    <mesh position={[0,.4,-20.82]}><boxGeometry args={[2.8,3.7,.05]}/><meshStandardMaterial color="#fff" emissive="#fff" emissiveIntensity={1.5}/></mesh>
+    <mesh position={[-4.55,-1.7,-7]}><boxGeometry args={[.12,.25,28]}/><meshStandardMaterial color="#644b36"/></mesh>
+    <mesh position={[4.55,-1.7,-7]}><boxGeometry args={[.12,.25,28]}/><meshStandardMaterial color="#644b36"/></mesh>
+    {[2,-3,-8,-13,-18].map(z=><Lamp key={z} z={z}/>)}
+    {projects.map((p,i)=><Door key={p.title} project={p} index={i}/>)}
+    <Text position={[0,1.05,-20.65]} fontSize={.24} color="#4b443c">KEEP EXPLORING</Text>
+    <ambientLight intensity={1.7}/><directionalLight position={[0,6,5]} intensity={1.7} color="#fff5df"/>
+    <Movement paused={paused}/>
+  </>
 }
 
-export default Scene
+function Panel({ view, project, close, select }) {
+  return <div className="backdrop" onMouseDown={close}><article className="panel" onMouseDown={e=>e.stopPropagation()}>
+    <button className="close" onClick={close}>×</button>
+    {view==="about" && <><span className="eyebrow">ABOUT ME</span><h1>Kang Jin</h1><p className="lead">Game Design student focused on level design, gameplay systems and interactive experiences.</p><p>I build spaces that teach through play. My process moves from research and blockout to rapid iteration, playtesting and refinement. I enjoy action-focused design, environmental storytelling and mechanics that create meaningful player choices.</p><p>Currently studying Game Design at Teesside University in the United Kingdom.</p></>}
+    {view==="skills" && <><span className="eyebrow">DESIGN TOOLKIT</span><h1>Skills</h1><div className="skills"><div><h3>Design</h3><p>Level Design<br/>Game Systems<br/>UI/UX Design<br/>Prototyping<br/>Playtesting</p></div><div><h3>Engines</h3><p>Unreal Engine 5<br/>Unity 2022 / Unity 6<br/>Blueprint<br/>C#</p></div><div><h3>Creative</h3><p>Blender<br/>Maya<br/>Photoshop<br/>Figma</p></div></div></>}
+    {view==="contact" && <><span className="eyebrow">LET'S CONNECT</span><h1>Contact</h1><p className="lead">Open to game design collaborations, internships and portfolio conversations.</p><a className="link" href="https://github.com/kangjin358-ctrl" target="_blank" rel="noreferrer">GitHub ↗</a><p className="note">Email and LinkedIn can be added when the final public contact details are ready.</p></>}
+    {view==="projects" && !project && <><span className="eyebrow">SELECTED WORK</span><h1>Project Archive</h1><div className="list">{projects.map((p,i)=><button key={p.title} onClick={()=>select(p)}><span>{String(i+1).padStart(2,"0")}</span><strong>{p.title}</strong><small>{p.role}</small></button>)}</div></>}
+    {project && <><span className="eyebrow">{project.role} · {project.date}</span><h1>{project.title}</h1><h2>{project.subtitle}</h2><p className="lead">{project.summary}</p><div className="tools">{project.tools}</div><h3>Design highlights</h3><ul>{project.points.map(x=><li key={x}>{x}</li>)}</ul><button className="link" onClick={()=>select(null)}>← All projects</button></>}
+  </article></div>
+}
+
+export default function Scene() {
+  const [view,setView]=useState(null), [project,setProject]=useState(null)
+  const open = v => { setProject(null); setView(v); document.exitPointerLock?.() }
+  const close = () => { setView(null); setProject(null) }
+  return <main className="shell">
+    <Canvas camera={{position:[0,0,5],fov:65}}><color attach="background" args={["#d8d2c7"]}/><Corridor paused={!!view}/>{!view&&<PointerLockControls/>}</Canvas>
+    <header><button className="brand" onClick={()=>open("about")}><strong>KANG JIN</strong><span>GAME DESIGN PORTFOLIO</span></button><nav>{["about","projects","skills","contact"].map(x=><button key={x} onClick={()=>open(x)}>{x}</button>)}</nav></header>
+    <div className="crosshair"/><div className="instructions"><b>CLICK TO EXPLORE</b><br/>WASD · MOVE&nbsp;&nbsp; MOUSE · LOOK&nbsp;&nbsp; ESC · RELEASE</div>
+    <div className="dock">{projects.map((p,i)=><button key={p.title} onClick={()=>{setProject(p);setView("project")}}><span>{String(i+1).padStart(2,"0")}</span>{p.title}</button>)}</div>
+    {view&&<Panel view={view} project={project} close={close} select={p=>{setProject(p);setView(p?"project":"projects")}}/>}
+  </main>
+}

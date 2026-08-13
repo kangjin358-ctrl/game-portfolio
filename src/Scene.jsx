@@ -68,9 +68,10 @@ function Door({ item, index, open }) {
     if (pivot.current) pivot.current.rotation.y = THREE.MathUtils.damp(pivot.current.rotation.y,target,6,dt)
   })
   return <group position={[left?-4.58:4.58,-.2,z]} rotation={[0,left?Math.PI/2:-Math.PI/2,0]}>
-    <mesh position={[-1.16,0,0]}><boxGeometry args={[.18,4.2,.22]}/><meshStandardMaterial color="#5d4633"/></mesh>
-    <mesh position={[1.16,0,0]}><boxGeometry args={[.18,4.2,.22]}/><meshStandardMaterial color="#5d4633"/></mesh>
-    <mesh position={[0,2.01,0]}><boxGeometry args={[2.5,.18,.22]}/><meshStandardMaterial color="#5d4633"/></mesh>
+    <mesh position={[0,2.58,-.02]}><boxGeometry args={[3.15,1.18,.28]}/><meshStandardMaterial color="#d9d3c8"/></mesh>
+    <mesh position={[-1.34,0,0]}><boxGeometry args={[.42,4.25,.28]}/><meshStandardMaterial color="#5d4633"/></mesh>
+    <mesh position={[1.34,0,0]}><boxGeometry args={[.42,4.25,.28]}/><meshStandardMaterial color="#5d4633"/></mesh>
+    <mesh position={[0,2.02,0]}><boxGeometry args={[3.1,.28,.28]}/><meshStandardMaterial color="#5d4633"/></mesh>
     <group ref={pivot} position={[-1.04,0,.14]}>
       <group position={[1.04,0,0]}>
         <mesh><boxGeometry args={[2.08,3.75,.12]}/><meshStandardMaterial color={left?"#ded3bf":"#c9d1c8"} roughness={.9}/></mesh>

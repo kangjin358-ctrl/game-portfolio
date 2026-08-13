@@ -44,7 +44,7 @@ function Movement({ paused }) {
     if (keys.current.KeyS) camera.position.addScaledVector(f, -4*dt)
     if (keys.current.KeyA) camera.position.addScaledVector(r, -4*dt)
     if (keys.current.KeyD) camera.position.addScaledVector(r, 4*dt)
-    camera.position.x = THREE.MathUtils.clamp(camera.position.x,-3.8,3.8)
+    camera.position.x = THREE.MathUtils.clamp(camera.position.x,-12,12)
     camera.position.z = THREE.MathUtils.clamp(camera.position.z,-18,5)
     camera.position.y = 0
   })
@@ -60,30 +60,93 @@ function Lamp({ z }) {
   </group>
 }
 
-function Door({ item, index }) {
-  const left = index%2===0, z = 2-index*3.15
+function Door({ item, index, open }) {
+  const left = index%2===0, z = 2-index*5
+  const pivot = useRef()
+  useFrame((_,dt) => {
+    const target = open ? (left ? -Math.PI/2 : Math.PI/2) : 0
+    if (pivot.current) pivot.current.rotation.y = THREE.MathUtils.damp(pivot.current.rotation.y,target,6,dt)
+  })
   return <group position={[left?-4.58:4.58,-.2,z]} rotation={[0,left?Math.PI/2:-Math.PI/2,0]}>
-    <mesh><boxGeometry args={[2.45,4.15,.2]}/><meshStandardMaterial color="#73583f"/></mesh>
-    <mesh position={[0,0,.13]}><boxGeometry args={[2.08,3.75,.12]}/><meshStandardMaterial color={left?"#ded3bf":"#c9d1c8"} roughness={.9}/></mesh>
-    <mesh position={[0,1.45,.23]}><boxGeometry args={[1.75,.74,.07]}/><meshStandardMaterial color="#181716"/></mesh>
-    <Text position={[0,1.45,.28]} fontSize={.17} color="#f4ead7" maxWidth={1.55} textAlign="center">{item.title}</Text>
-    <Text position={[0,.35,.22]} fontSize={.11} color="#443d35" maxWidth={1.55} textAlign="center">{item.label.toUpperCase()}</Text>
-    <mesh position={[.72,-.55,.25]}><sphereGeometry args={[.085,16,16]}/><meshStandardMaterial color="#282522" metalness={.55}/></mesh>
+    <mesh><boxGeometry args={[2.5,4.2,.22]}/><meshStandardMaterial color="#5d4633"/></mesh>
+    <group ref={pivot} position={[-1.04,0,.14]}>
+      <group position={[1.04,0,0]}>
+        <mesh><boxGeometry args={[2.08,3.75,.12]}/><meshStandardMaterial color={left?"#ded3bf":"#c9d1c8"} roughness={.9}/></mesh>
+        <mesh position={[0,1.45,.08]}><boxGeometry args={[1.75,.74,.07]}/><meshStandardMaterial color="#181716"/></mesh>
+        <Text position={[0,1.45,.13]} fontSize={.17} color="#f4ead7" maxWidth={1.55} textAlign="center">{item.title}</Text>
+        <Text position={[0,.35,.13]} fontSize={.11} color="#443d35" maxWidth={1.55} textAlign="center">{item.label.toUpperCase()}</Text>
+        <mesh position={[.72,-.55,.13]}><sphereGeometry args={[.085,16,16]}/><meshStandardMaterial color="#282522" metalness={.55}/></mesh>
+      </group>
+    </group>
   </group>
 }
 
-function Corridor({ paused }) {
+const roomThemes = [
+  { floor:"#272321", wall:"#4b403b", light:"#8da0b8", title:"HORROR ARCHIVE" },
+  { floor:"#503a25", wall:"#80613d", light:"#ffca73", title:"AUCTION HALL" },
+  { floor:"#193b3d", wall:"#255b5d", light:"#72e6d1", title:"AR LABORATORY" },
+  { floor:"#3c4930", wall:"#65734d", light:"#e4b56b", title:"ISLAND WAR ROOM" },
+  { floor:"#26313c", wall:"#536678", light:"#b8d8f2", title:"CONTACT STUDIO" },
+]
+
+function ProjectRoom({ item,index }) {
+  const left=index%2===0, z=2-index*5, direction=left?-1:1, centerX=direction*8.4
+  const theme=roomThemes[index]
+  return <group>
+    <mesh position={[centerX,-2,z]}><boxGeometry args={[7.4,.25,4.5]}/><meshStandardMaterial color={theme.floor}/></mesh>
+    <mesh position={[direction*12.05,.3,z]}><boxGeometry args={[.22,4.7,4.5]}/><meshStandardMaterial color={theme.wall}/></mesh>
+    <mesh position={[centerX,.3,z-2.25]}><boxGeometry args={[7.4,4.7,.22]}/><meshStandardMaterial color={theme.wall}/></mesh>
+    <mesh position={[centerX,.3,z+2.25]}><boxGeometry args={[7.4,4.7,.22]}/><meshStandardMaterial color={theme.wall}/></mesh>
+    <mesh position={[centerX,2.65,z]}><boxGeometry args={[7.4,.18,4.5]}/><meshStandardMaterial color="#171716"/></mesh>
+    <pointLight position={[centerX,1.7,z]} intensity={18} distance={8} color={theme.light}/>
+    <Text position={[direction*11.85,.8,z]} rotation={[0,left?Math.PI/2:-Math.PI/2,0]} fontSize={.34} color="#f4eee4" maxWidth={3.2} textAlign="center">{theme.title}</Text>
+    <Text position={[direction*11.82,.15,z]} rotation={[0,left?Math.PI/2:-Math.PI/2,0]} fontSize={.15} color={theme.light} maxWidth={3} textAlign="center">{item.title}</Text>
+  </group>
+}
+
+function SideWall({ left }) {
+  const doorZ = corridorDoors.map((_,i)=>(i%2===0)===left ? 2-i*5 : null).filter(v=>v!==null)
+  const panels=[]
+  for(let z=4;z>=-20;z-=1) {
+    if(!doorZ.some(d=>Math.abs(d-z)<1.35)) panels.push(z)
+  }
+  return <>{panels.map(z=><mesh key={z} position={[left?-4.75:4.75,.5,z]}><boxGeometry args={[.25,5,1.05]}/><meshStandardMaterial color="#d9d3c8"/></mesh>)}</>
+}
+
+function Corridor({ paused, onNear }) {
+  const { camera }=useThree()
+  const [opened,setOpened]=useState({})
+  const nearestRef=useRef(null)
+  useFrame(()=>{
+    let nearest=null, distance=2.25
+    corridorDoors.forEach((_,i)=>{
+      const left=i%2===0, z=2-i*5
+      const d=Math.hypot(camera.position.x-(left?-4.25:4.25),camera.position.z-z)
+      if(d<distance){distance=d;nearest=i}
+    })
+    if(nearest!==nearestRef.current){nearestRef.current=nearest;onNear(nearest===null?null:corridorDoors[nearest])}
+  })
+  useEffect(()=>{
+    const interact=e=>{
+      if(e.code==="KeyE"&&nearestRef.current!==null){
+        const i=nearestRef.current
+        setOpened(current=>({...current,[i]:!current[i]}))
+      }
+    }
+    addEventListener("keydown",interact)
+    return()=>removeEventListener("keydown",interact)
+  },[])
   return <>
     <mesh position={[0,-2,-7]}><boxGeometry args={[9.5,.25,28]}/><meshStandardMaterial color="#a89478" roughness={.9}/></mesh>
-    <mesh position={[-4.75,.5,-7]}><boxGeometry args={[.25,5,28]}/><meshStandardMaterial color="#d9d3c8"/></mesh>
-    <mesh position={[4.75,.5,-7]}><boxGeometry args={[.25,5,28]}/><meshStandardMaterial color="#d9d3c8"/></mesh>
+    <SideWall left/><SideWall left={false}/>
     <mesh position={[0,3,-7]}><boxGeometry args={[9.5,.25,28]}/><meshStandardMaterial color="#e9e5dc"/></mesh>
     <mesh position={[0,.5,-21]}><boxGeometry args={[9.5,5,.25]}/><meshStandardMaterial color="#d3cdc2"/></mesh>
     <mesh position={[0,.4,-20.82]}><boxGeometry args={[2.8,3.7,.05]}/><meshStandardMaterial color="#fff" emissive="#fff" emissiveIntensity={1.5}/></mesh>
     <mesh position={[-4.55,-1.7,-7]}><boxGeometry args={[.12,.25,28]}/><meshStandardMaterial color="#644b36"/></mesh>
     <mesh position={[4.55,-1.7,-7]}><boxGeometry args={[.12,.25,28]}/><meshStandardMaterial color="#644b36"/></mesh>
     {[2,-3,-8,-13,-18].map(z=><Lamp key={z} z={z}/>)}
-    {corridorDoors.map((item,i)=><Door key={item.title} item={item} index={i}/>)}
+    {corridorDoors.map((item,i)=><Door key={item.title} item={item} index={i} open={Boolean(opened[i])}/>)}
+    {corridorDoors.map((item,i)=><ProjectRoom key={item.title} item={item} index={i}/>)}
     <Text position={[0,1.05,-20.65]} fontSize={.24} color="#4b443c">KEEP EXPLORING</Text>
     <ambientLight intensity={1.7}/><directionalLight position={[0,6,5]} intensity={1.7} color="#fff5df"/>
     <Movement paused={paused}/>
@@ -105,12 +168,13 @@ function Panel({ view, project, close, select }) {
 
 export default function Scene() {
   const [view,setView]=useState(null), [project,setProject]=useState(null)
+  const [nearDoor,setNearDoor]=useState(null)
   const open = v => { setProject(null); setView(v); document.exitPointerLock?.() }
   const close = () => { setView(null); setProject(null) }
   return <main className="shell">
-    <Canvas camera={{position:[0,0,5],fov:65}}><color attach="background" args={["#d8d2c7"]}/><Corridor paused={!!view}/>{!view&&<PointerLockControls/>}</Canvas>
+    <Canvas camera={{position:[0,0,5],fov:65}}><color attach="background" args={["#d8d2c7"]}/><Corridor paused={!!view} onNear={setNearDoor}/>{!view&&<PointerLockControls/>}</Canvas>
     <header><button className="brand" onClick={()=>open("about")}><strong>KANG JIN</strong><span>GAME DESIGN PORTFOLIO</span></button><nav>{["projects","contact"].map(x=><button key={x} onClick={()=>open(x)}>{x}</button>)}</nav></header>
-    <div className="crosshair"/><div className="instructions"><b>CLICK TO EXPLORE</b><br/>WASD · MOVE&nbsp;&nbsp; MOUSE · LOOK&nbsp;&nbsp; ESC · RELEASE</div>
+    <div className="crosshair"/>{nearDoor&&!view&&<div className="interact">PRESS <b>E</b> TO OPEN · {nearDoor.title}</div>}<div className="instructions"><b>CLICK TO EXPLORE</b><br/>WASD · MOVE&nbsp;&nbsp; MOUSE · LOOK&nbsp;&nbsp; E · OPEN&nbsp;&nbsp; ESC · RELEASE</div>
     <div className="dock">{corridorDoors.map(item=><button key={item.title} onClick={()=>{setProject(item.project||null);setView(item.project?"project":item.view)}}>{item.title}</button>)}</div>
     {view&&<Panel view={view} project={project} close={close} select={p=>{setProject(p);setView(p?"project":"projects")}}/>}
   </main>

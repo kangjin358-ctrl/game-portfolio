@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react"
 import * as THREE from "three"
 
 const projects = [
-  { title:"THE CORRIDOR", subtitle:"Psychological Horror UI", role:"UI/UX & Game Designer", tools:"Unreal Engine 5 · Blueprint · Figma", date:"2025–2026", summary:"A psychological horror prototype set in a monastery-like corridor. I designed an understated HUD, radial inventory and environmental guidance for a tense, readable experience.", points:["Heartbeat health feedback","Five-slot radial inventory","Environmental interaction guidance"] },
-  { title:"TIME COLLECTOR", subtitle:"Auction & Bluffing Board Game", role:"Game & System Designer", tools:"Tabletop Prototyping · Figma · Playtesting", date:"2026", summary:"A 3–4 player auction game about collecting antiques with hidden authenticity. Players inspect, bluff, pawn and bid while pursuing sets, trends and secret identities.", points:["Hidden-value auction system","24 antiques across four collections","Economy refined through playtests"] },
-  { title:"ELEMENT FRONT", subtitle:"AR Element Strategy Game", role:"Game Designer & Programmer", tools:"Unity 2022 · C# · AR Foundation", date:"2026", summary:"An AR tactical battle game built around fire, water and wood counters. Scanning cards creates units and battlefields, while elemental terrain rewards deliberate placement.", points:["Five tactical battle maps","10×10 placement grid","Element counters and terrain bonuses"] },
+  { title:"THE MONASTERY", subtitle:"Psychological Horror UI", role:"UI/UX & Game Designer", tools:"Unreal Engine 5 · Blueprint · Figma", date:"2025–2026", summary:"A psychological horror prototype set in a monastery-like corridor. I designed an understated HUD, radial inventory and environmental guidance for a tense, readable experience.", points:["Heartbeat health feedback","Five-slot radial inventory","Environmental interaction guidance"] },
+  { title:"时代收藏家", subtitle:"Auction & Bluffing Board Game", role:"Game & System Designer", tools:"Tabletop Prototyping · Figma · Playtesting", date:"2026", summary:"A 3–4 player auction game about collecting antiques with hidden authenticity. Players inspect, bluff, pawn and bid while pursuing sets, trends and secret identities.", points:["Hidden-value auction system","24 antiques across four collections","Economy refined through playtests"] },
+  { title:"ELEMENT FORGE", subtitle:"AR Element Strategy Game", role:"Game Designer & Programmer", tools:"Unity 2022 · C# · AR Foundation", date:"2026", summary:"An AR tactical battle game built around fire, water and wood counters. Scanning cards creates units and battlefields, while elemental terrain rewards deliberate placement.", points:["Five tactical battle maps","10×10 placement grid","Element counters and terrain bonuses"] },
   { title:"DOG OF WAR", subtitle:"Open-world Island Adventure", role:"Level Designer", tools:"Unity · Blender · Maya · Playtesting", date:"2026", summary:"A chaotic open-world-style exploration game set on a WWII island. I designed the jungle, military camp and open plain, then reduced the map through playtesting to keep the experience within 5–10 minutes.", points:["Three-zone island layout","Movement-skill tutorial spaces","Multiple endings and exploration routes"] },
 ]
 
@@ -23,7 +23,7 @@ const growth = [
 
 const corridorDoors = [
   ...projects.map(project => ({ title:project.title, label:project.role, project })),
-  { title:"CONTACT", label:"LET'S CONNECT", view:"contact" },
+  { title:"CONTACT ME", label:"LET'S CONNECT", view:"contact" },
 ]
 
 function Movement({ paused }) {
@@ -67,7 +67,7 @@ function Door({ item, index }) {
     <mesh position={[0,0,.13]}><boxGeometry args={[2.08,3.75,.12]}/><meshStandardMaterial color={left?"#ded3bf":"#c9d1c8"} roughness={.9}/></mesh>
     <mesh position={[0,1.45,.23]}><boxGeometry args={[1.75,.74,.07]}/><meshStandardMaterial color="#181716"/></mesh>
     <Text position={[0,1.45,.28]} fontSize={.17} color="#f4ead7" maxWidth={1.55} textAlign="center">{item.title}</Text>
-    <Text position={[0,.35,.22]} fontSize={.11} color="#443d35" maxWidth={1.55} textAlign="center">{`${String(index+1).padStart(2,"0")}\n${item.label.toUpperCase()}`}</Text>
+    <Text position={[0,.35,.22]} fontSize={.11} color="#443d35" maxWidth={1.55} textAlign="center">{item.label.toUpperCase()}</Text>
     <mesh position={[.72,-.55,.25]}><sphereGeometry args={[.085,16,16]}/><meshStandardMaterial color="#282522" metalness={.55}/></mesh>
   </group>
 }
@@ -111,7 +111,7 @@ export default function Scene() {
     <Canvas camera={{position:[0,0,5],fov:65}}><color attach="background" args={["#d8d2c7"]}/><Corridor paused={!!view}/>{!view&&<PointerLockControls/>}</Canvas>
     <header><button className="brand" onClick={()=>open("about")}><strong>KANG JIN</strong><span>GAME DESIGN PORTFOLIO</span></button><nav>{["projects","contact"].map(x=><button key={x} onClick={()=>open(x)}>{x}</button>)}</nav></header>
     <div className="crosshair"/><div className="instructions"><b>CLICK TO EXPLORE</b><br/>WASD · MOVE&nbsp;&nbsp; MOUSE · LOOK&nbsp;&nbsp; ESC · RELEASE</div>
-    <div className="dock">{corridorDoors.map((item,i)=><button key={item.title} onClick={()=>{setProject(item.project||null);setView(item.project?"project":item.view)}}><span>{String(i+1).padStart(2,"0")}</span>{item.title}</button>)}</div>
+    <div className="dock">{corridorDoors.map(item=><button key={item.title} onClick={()=>{setProject(item.project||null);setView(item.project?"project":item.view)}}>{item.title}</button>)}</div>
     {view&&<Panel view={view} project={project} close={close} select={p=>{setProject(p);setView(p?"project":"projects")}}/>}
   </main>
 }

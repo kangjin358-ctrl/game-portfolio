@@ -4,11 +4,28 @@ import { useEffect, useRef, useState } from "react"
 import * as THREE from "three"
 
 const projects = [
-  { title:"DOG OF WAR", subtitle:"Jerky Dog Simulator", role:"Level Designer", tools:"Unity · Level Design · Playtesting", date:"2026", summary:"A short, chaotic exploration game set on a WWII island. I designed the jungle, military camp and open plain, then reduced the map through playtesting to keep the experience within 5–10 minutes.", points:["Three-zone island layout","Movement-skill tutorial spaces","Multiple endings and exploration routes"] },
-  { title:"GRAVITY ANCHOR", subtitle:"Two-player Physics Platformer", role:"Game & Level Designer", tools:"Unity · C# · 2D Physics", date:"2026", summary:"A local co-op platformer where two magnetic spirits switch polarity to attract, repel and activate gravity anchors across collaborative levels.", points:["Co-op magnetic interaction","Physics-based puzzles","Dungeon, ground and sky progression"] },
-  { title:"ELEMENT FRONT", subtitle:"AR Element Strategy Game", role:"Game Designer & Programmer", tools:"Unity 2022 · C# · AR", date:"2026", summary:"An AR tactical battle game built around fire, water and wood counters. Scanning cards creates units and battlefields, while elemental terrain rewards deliberate placement.", points:["Five tactical battle maps","10×10 placement grid","Element counters and terrain bonuses"] },
-  { title:"TIME COLLECTOR", subtitle:"Auction & Bluffing Board Game", role:"Game & System Designer", tools:"Tabletop Prototyping · Figma · Playtesting", date:"2026", summary:"A 3–4 player auction game about collecting antiques with hidden authenticity. Players inspect, bluff, pawn and bid while pursuing sets, trends and secret identities.", points:["Hidden-value auction system","24 antiques across four collections","Economy refined through playtests"] },
   { title:"THE CORRIDOR", subtitle:"Psychological Horror UI", role:"UI/UX & Game Designer", tools:"Unreal Engine 5 · Blueprint · Figma", date:"2025–2026", summary:"A psychological horror prototype set in a monastery-like corridor. I designed an understated HUD, radial inventory and environmental guidance for a tense, readable experience.", points:["Heartbeat health feedback","Five-slot radial inventory","Environmental interaction guidance"] },
+  { title:"TIME COLLECTOR", subtitle:"Auction & Bluffing Board Game", role:"Game & System Designer", tools:"Tabletop Prototyping · Figma · Playtesting", date:"2026", summary:"A 3–4 player auction game about collecting antiques with hidden authenticity. Players inspect, bluff, pawn and bid while pursuing sets, trends and secret identities.", points:["Hidden-value auction system","24 antiques across four collections","Economy refined through playtests"] },
+  { title:"ELEMENT FRONT", subtitle:"AR Element Strategy Game", role:"Game Designer & Programmer", tools:"Unity 2022 · C# · AR Foundation", date:"2026", summary:"An AR tactical battle game built around fire, water and wood counters. Scanning cards creates units and battlefields, while elemental terrain rewards deliberate placement.", points:["Five tactical battle maps","10×10 placement grid","Element counters and terrain bonuses"] },
+  { title:"DOG OF WAR", subtitle:"Open-world Island Adventure", role:"Level Designer", tools:"Unity · Blender · Maya · Playtesting", date:"2026", summary:"A chaotic open-world-style exploration game set on a WWII island. I designed the jungle, military camp and open plain, then reduced the map through playtesting to keep the experience within 5–10 minutes.", points:["Three-zone island layout","Movement-skill tutorial spaces","Multiple endings and exploration routes"] },
+]
+
+const inspirations = [
+  { title:"Guiding Players Without Words", text:"I explore how lighting, colour, composition and landmarks can guide players without relying on large amounts of instructional text.", application:"Important routes and interactive objects use brighter lighting and stronger colour contrast, while background elements remain quieter." },
+  { title:"Teaching Mechanics Through Space", text:"I treat the environment as part of the tutorial, creating safe spaces where players can experiment before mechanics are combined with new risks.", application:"Each mechanic progresses from introduction, to practice, and finally to mastery through level layout." },
+]
+
+const growth = [
+  { part:"ROOTS", title:"Discovering Game Design", text:"I moved from simply playing games to analysing navigation, challenge, feedback and the reasons behind each design decision." },
+  { part:"TRUNK", title:"Building My Foundations", text:"Studying Game Design at Teesside University helped me turn ideas into playable prototypes using Unity, Unreal Engine 5, C# and Blueprint." },
+  { part:"LEAVES", title:"Learning Through Iteration", text:"Team projects and playtests taught me to collect feedback and revise scale, pacing, guidance and mechanics to create clearer player experiences." },
+]
+
+const corridorDoors = [
+  ...projects.map(project => ({ title:project.title, label:project.role, project })),
+  { title:"CREATIVE SPACE", label:"IDEAS & INSPIRATION", view:"creative" },
+  { title:"GROWTH TREE", label:"MY JOURNEY", view:"growth" },
+  { title:"CONTACT", label:"LET'S CONNECT", view:"contact" },
 ]
 
 function Movement({ paused }) {
@@ -45,14 +62,14 @@ function Lamp({ z }) {
   </group>
 }
 
-function Door({ project, index }) {
-  const left = index%2===0, z = 1-index*4.3
+function Door({ item, index }) {
+  const left = index%2===0, z = 2-index*3.15
   return <group position={[left?-4.58:4.58,-.2,z]} rotation={[0,left?Math.PI/2:-Math.PI/2,0]}>
     <mesh><boxGeometry args={[2.45,4.15,.2]}/><meshStandardMaterial color="#73583f"/></mesh>
     <mesh position={[0,0,.13]}><boxGeometry args={[2.08,3.75,.12]}/><meshStandardMaterial color={left?"#ded3bf":"#c9d1c8"} roughness={.9}/></mesh>
     <mesh position={[0,1.45,.23]}><boxGeometry args={[1.75,.74,.07]}/><meshStandardMaterial color="#181716"/></mesh>
-    <Text position={[0,1.45,.28]} fontSize={.19} color="#f4ead7" maxWidth={1.55} textAlign="center">{project.title}</Text>
-    <Text position={[0,.35,.22]} fontSize={.13} color="#443d35" maxWidth={1.55} textAlign="center">{`${String(index+1).padStart(2,"0")}\n${project.role.toUpperCase()}`}</Text>
+    <Text position={[0,1.45,.28]} fontSize={.17} color="#f4ead7" maxWidth={1.55} textAlign="center">{item.title}</Text>
+    <Text position={[0,.35,.22]} fontSize={.11} color="#443d35" maxWidth={1.55} textAlign="center">{`${String(index+1).padStart(2,"0")}\n${item.label.toUpperCase()}`}</Text>
     <mesh position={[.72,-.55,.25]}><sphereGeometry args={[.085,16,16]}/><meshStandardMaterial color="#282522" metalness={.55}/></mesh>
   </group>
 }
@@ -68,7 +85,7 @@ function Corridor({ paused }) {
     <mesh position={[-4.55,-1.7,-7]}><boxGeometry args={[.12,.25,28]}/><meshStandardMaterial color="#644b36"/></mesh>
     <mesh position={[4.55,-1.7,-7]}><boxGeometry args={[.12,.25,28]}/><meshStandardMaterial color="#644b36"/></mesh>
     {[2,-3,-8,-13,-18].map(z=><Lamp key={z} z={z}/>)}
-    {projects.map((p,i)=><Door key={p.title} project={p} index={i}/>)}
+    {corridorDoors.map((item,i)=><Door key={item.title} item={item} index={i}/>)}
     <Text position={[0,1.05,-20.65]} fontSize={.24} color="#4b443c">KEEP EXPLORING</Text>
     <ambientLight intensity={1.7}/><directionalLight position={[0,6,5]} intensity={1.7} color="#fff5df"/>
     <Movement paused={paused}/>
@@ -80,7 +97,9 @@ function Panel({ view, project, close, select }) {
     <button className="close" onClick={close}>×</button>
     {view==="about" && <><span className="eyebrow">ABOUT ME</span><h1>Kang Jin</h1><p className="lead">Game Design student focused on level design, gameplay systems and interactive experiences.</p><p>I build spaces that teach through play. My process moves from research and blockout to rapid iteration, playtesting and refinement. I enjoy action-focused design, environmental storytelling and mechanics that create meaningful player choices.</p><p>Currently studying Game Design at Teesside University in the United Kingdom.</p></>}
     {view==="skills" && <><span className="eyebrow">DESIGN TOOLKIT</span><h1>Skills</h1><div className="skills"><div><h3>Design</h3><p>Level Design<br/>Game Systems<br/>UI/UX Design<br/>Prototyping<br/>Playtesting</p></div><div><h3>Engines</h3><p>Unreal Engine 5<br/>Unity 2022 / Unity 6<br/>Blueprint<br/>C#</p></div><div><h3>Creative</h3><p>Blender<br/>Maya<br/>Photoshop<br/>Figma</p></div></div></>}
-    {view==="contact" && <><span className="eyebrow">LET'S CONNECT</span><h1>Contact</h1><p className="lead">Open to game design collaborations, internships and portfolio conversations.</p><a className="link" href="https://github.com/kangjin358-ctrl" target="_blank" rel="noreferrer">GitHub ↗</a><p className="note">Email and LinkedIn can be added when the final public contact details are ready.</p></>}
+    {view==="creative" && <><span className="eyebrow">IDEAS & INSPIRATION</span><h1>Creative Space</h1><p className="lead">Two ideas that shape how I approach game and level design.</p><div className="records">{inspirations.map((item,i)=><section key={item.title}><span>0{i+1}</span><h2>{item.title}</h2><p>{item.text}</p><p><strong>Design application:</strong> {item.application}</p></section>)}</div></>}
+    {view==="growth" && <><span className="eyebrow">MY JOURNEY</span><h1>Growth Tree</h1><p className="lead">The roots represent curiosity, the trunk represents technical foundations, and every leaf records a lesson learned through making games.</p><div className="records growth">{growth.map(item=><section key={item.part}><span>{item.part}</span><h2>{item.title}</h2><p>{item.text}</p></section>)}</div></>}
+    {view==="contact" && <><span className="eyebrow">LET'S CONNECT</span><h1>Contact</h1><p className="lead">Open to game design collaborations, internships and portfolio conversations.</p><div className="contact-links"><a className="link" href="mailto:m13701714139@163.com">Email ↗</a><a className="link" href="tel:+8619901855351">19901855351</a><a className="link" href="tel:+447765636973">07765636973</a><a className="link" href="https://github.com/kangjin358-ctrl" target="_blank" rel="noreferrer">GitHub ↗</a></div><p className="note">m13701714139@163.com</p></>}
     {view==="projects" && !project && <><span className="eyebrow">SELECTED WORK</span><h1>Project Archive</h1><div className="list">{projects.map((p,i)=><button key={p.title} onClick={()=>select(p)}><span>{String(i+1).padStart(2,"0")}</span><strong>{p.title}</strong><small>{p.role}</small></button>)}</div></>}
     {project && <><span className="eyebrow">{project.role} · {project.date}</span><h1>{project.title}</h1><h2>{project.subtitle}</h2><p className="lead">{project.summary}</p><div className="tools">{project.tools}</div><h3>Design highlights</h3><ul>{project.points.map(x=><li key={x}>{x}</li>)}</ul><button className="link" onClick={()=>select(null)}>← All projects</button></>}
   </article></div>
@@ -92,9 +111,9 @@ export default function Scene() {
   const close = () => { setView(null); setProject(null) }
   return <main className="shell">
     <Canvas camera={{position:[0,0,5],fov:65}}><color attach="background" args={["#d8d2c7"]}/><Corridor paused={!!view}/>{!view&&<PointerLockControls/>}</Canvas>
-    <header><button className="brand" onClick={()=>open("about")}><strong>KANG JIN</strong><span>GAME DESIGN PORTFOLIO</span></button><nav>{["about","projects","skills","contact"].map(x=><button key={x} onClick={()=>open(x)}>{x}</button>)}</nav></header>
+    <header><button className="brand" onClick={()=>open("about")}><strong>KANG JIN</strong><span>GAME DESIGN PORTFOLIO</span></button><nav>{["about","projects","creative","growth","contact"].map(x=><button key={x} onClick={()=>open(x)}>{x}</button>)}</nav></header>
     <div className="crosshair"/><div className="instructions"><b>CLICK TO EXPLORE</b><br/>WASD · MOVE&nbsp;&nbsp; MOUSE · LOOK&nbsp;&nbsp; ESC · RELEASE</div>
-    <div className="dock">{projects.map((p,i)=><button key={p.title} onClick={()=>{setProject(p);setView("project")}}><span>{String(i+1).padStart(2,"0")}</span>{p.title}</button>)}</div>
+    <div className="dock">{corridorDoors.map((item,i)=><button key={item.title} onClick={()=>{setProject(item.project||null);setView(item.project?"project":item.view)}}><span>{String(i+1).padStart(2,"0")}</span>{item.title}</button>)}</div>
     {view&&<Panel view={view} project={project} close={close} select={p=>{setProject(p);setView(p?"project":"projects")}}/>}
   </main>
 }

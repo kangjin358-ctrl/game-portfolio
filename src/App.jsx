@@ -87,7 +87,7 @@ function DogCaseStudy({project,tr}){
 
 function ProjectModal({project,close,tr}){
   useEffect(()=>{const escape=e=>e.key==="Escape"&&close();addEventListener("keydown",escape);return()=>removeEventListener("keydown",escape)},[close])
-  return <div className="modal-backdrop" onMouseDown={close}><article className="modal" onMouseDown={e=>e.stopPropagation()}>
+  return <div className="modal-backdrop" onMouseDown={close}><article className={`modal modal-${project.id}`} onMouseDown={e=>e.stopPropagation()}>
     <button className="modal-close" onClick={close} aria-label="Close project">×</button><span className="kicker">{project.role} · {project.year}</span>
     {project.logo?<img className="modal-logo" src={project.logo} alt="Before the Hammer Falls"/>:<h2>{project.title}</h2>}
     <p className="modal-type">{project.type}</p><p className="modal-lead">{project.description}</p><ToolIcons tools={project.tools}/>

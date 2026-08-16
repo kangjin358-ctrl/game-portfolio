@@ -22,7 +22,7 @@ const systems=[
 const img=(src,alt)=>'<img loading="lazy" src="'+src+'" alt="'+alt+'">'
 function build(lang){const c=nxCopy[lang],z=lang==="zh",t=(a,b)=>z?b:a
 return '<section class="nx" data-lang="'+lang+'">'+
-'<div class="nx-hero"><div><span class="nx-eyebrow">AR · TACTICAL CARDS · AUTO BATTLE</span><h3>'+c.hero+'</h3><p>'+c.intro+'</p><p class="nx-insight">'+c.insight+'</p><div class="nx-facts"><b>10×10 GRID</b><b>3 ELEMENTS</b><b>5 LEVELS</b><b>AR MOBILE</b></div></div>'+img("/nexus-cards/overview.webp","NEXUS CARDS AR battlefield")+'</div>'+
+'<div class="nx-hero"><div><span class="nx-eyebrow">AR · TACTICAL CARDS · AUTO BATTLE</span><h3>'+c.hero+'</h3><p>'+c.intro+'</p><p class="nx-insight">'+c.insight+'</p><div class="nx-facts"><b>10×10 GRID</b><b>3 ELEMENTS</b><b>5 LEVELS</b><b>AR MOBILE</b></div></div>'+img("/nexus-cards-poster.webp","NEXUS CARDS AR battlefield")+'</div>'+
 '<div class="nx-flow">'+c.flow.map((x,i)=>'<div><span>'+String(i+1).padStart(2,"0")+'</span><b>'+x+'</b></div>').join("")+'</div>'+
 title("01",c.foundation)+
 '<div class="nx-foundation"><article><em>AUTO BATTLE</em><h4>Teamfight Tactics</h4><p>'+t("Auto-battle structure, tactical positioning and team composition before combat.","参考自动战斗结构、战前站位与队伍构成。")+'</p></article><article><em>CARD DEPLOYMENT</em><h4>Clash Royale</h4><p>'+t("Card-based deployment and readable arena combat, extended into physical AR cards.","参考卡牌部署与清晰竞技场战斗，并延伸到实体 AR 卡牌。")+'</p></article><article><em>ORIGINAL DIRECTION</em><h4>AR + ELEMENTS</h4><p>'+t("A physical-card 10×10 arena with elemental terrain and five authored formations.","结合实体卡牌、元素地形与五组预设阵型的 10×10 战场。")+'</p></article></div>'+

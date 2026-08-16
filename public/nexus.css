@@ -87,3 +87,77 @@
   }
   .nx-level-pair img{height:auto;max-height:300px;object-fit:contain}
 }
+
+
+/* Visual cleanup: borderless media and cleaner cards */
+.nx img{
+  border:0;
+  background:transparent;
+}
+.nx-hero>img{
+  object-fit:cover;
+  object-position:center;
+}
+.nx-unit{
+  background:transparent;
+  border-left:0;
+  border-right:0;
+  border-bottom:0;
+}
+.nx-unit-images{
+  background:#dce9e8;
+}
+.nx-unit-images img{
+  border:0;
+}
+.nx-unit-wood .nx-unit-images img:first-child{
+  transform:scale(1.18);
+  transform-origin:center;
+}
+.nx-levels article{
+  background:transparent;
+  border-left:0;
+  border-right:0;
+  border-bottom:0;
+  border-top:4px solid #4b9698;
+}
+.nx-level-pair{
+  background:#dce9e8;
+}
+.nx-level-pair img{
+  border:0;
+  object-fit:cover;
+}
+.nx-levels article:nth-child(3) .nx-level-pair img:last-child{
+  transform:scale(1.08);
+}
+.nx-confirm{
+  grid-template-columns:minmax(300px,.85fr) minmax(0,1.15fr);
+  overflow:hidden;
+}
+.nx-confirm>div{
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.nx-confirm img{
+  width:100%;
+  height:420px;
+  min-width:0;
+  object-fit:cover;
+  object-position:center 12%;
+  border:0;
+  background:#163337;
+}
+.nx-confirm h4{
+  max-width:100%;
+  font-size:clamp(22px,2.4vw,34px);
+  line-height:1.25;
+}
+.nx-systems article img{
+  border:0;
+}
+@media(max-width:800px){
+  .nx-confirm{grid-template-columns:1fr}
+  .nx-confirm img{height:360px}
+  .nx-unit-wood .nx-unit-images img:first-child{transform:scale(1.12)}
+}

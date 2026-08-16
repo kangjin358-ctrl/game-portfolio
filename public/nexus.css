@@ -161,3 +161,7 @@
   .nx-confirm img{height:360px}
   .nx-unit-wood .nx-unit-images img:first-child{transform:scale(1.12)}
 }
+
+
+/* Temporarily hide the Fantasy Room testing board */
+.case-image:has(>img[src="/the-monastery/testing.webp"]){display:none!important}

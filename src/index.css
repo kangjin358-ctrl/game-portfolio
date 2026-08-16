@@ -27,3 +27,4 @@
 .complete-boards{padding-top:72px;border-top:1px solid #59322f}.complete-boards .section-intro{max-width:760px;margin-bottom:30px}.complete-board-list{display:grid;gap:28px}.complete-board-list figure{margin:0;border:1px solid #52342f;background:#100e0d;overflow:hidden}.complete-board-list img{display:block;width:100%;height:auto}.complete-board-list figcaption{padding:12px 16px;border-top:1px solid #52342f;color:#bd9a7d;font:9px 'DM Mono',monospace;letter-spacing:.08em}
 
 .projects .section-heading h2>span{display:block}.projects .projects-subtitle{margin-top:.2em;font-size:.58em;line-height:1.08;letter-spacing:-.035em;color:#c7c0b6}
+.resume-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:34px}.resume-actions .button{min-width:170px;justify-content:space-between}.resume-actions .secondary{border-color:#ffffff40;color:#eee9df}

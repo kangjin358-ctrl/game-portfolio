@@ -1,7 +1,7 @@
 (()=>{
 const copy={
 en:{
-solo:"SOLO PROJECT · BOARD GAME & SYSTEM DESIGN",hero:"Build an auction empire on information, confidence and risk.",summary:"Players run rival auction houses in a fiercely competitive market. With limited time and resources, they acquire collectibles, verify authenticity, set estimates and host high-stakes auctions. Every item may hide a secret, and every raised paddle can shift both market value and player alliances.",concept:"A strategy board game combining auction bidding, antique authentication and auction-house management. Players think like merchants, act like auctioneers and outmanoeuvre rivals while navigating forgeries, insider information and price manipulation.",
+solo:"SOLO PROJECT · BOARD GAME & SYSTEM DESIGN",hero:"Build an auction empire on information, confidence and risk.",summary:"Players run rival auction houses in a fiercely competitive market. With limited time and resources, they acquire collectibles, verify authenticity, set estimates and host high-stakes auctions. Every item may hide a secret, and every raised paddle can shift both market value and player alliances.",concept:"A strategy board game combining auction bidding, antique authentication and auction-house management. Players think like merchants, act like auctioneers and outmanoeuvre rivals while navigating forgeries, insider information and price manipulation.",video:"GAMEPLAY VIDEO",watch:"WATCH ON YOUTUBE ↗",
 inspiration:"DESIGN INSPIRATION",inspirationText:"The project combines three perspectives on antiques: negotiation and uncertain prices at Shanghai’s Lingshi Road night market, professional valuation and controlled competition at Christie’s, and the suspense and emotional reveals of Chinese cultural-relic authentication programmes.",
 loop:"CORE GAMEPLAY",loopText:"Antiques show a visible category, rarity and starting value, but their true quality remains hidden. Players appraise, discuss, bluff and bid, then manage collections and resources before every secret is revealed in final scoring.",
 gameplay:"AUCTION FLOW",gameplayText:"Each auction turns incomplete information into a social and financial decision.",
@@ -35,7 +35,7 @@ future:"FUTURE PLAN",futureText:"I plan to expand the Identity deck and test a l
 open:"PUBLIC INFORMATION",hidden:"HIDDEN INFORMATION",quality:"Quality & authenticity",trend:"Current market trend",identity:"Opponent identities",private:"Private appraisal results"
 },
 zh:{
-solo:"个人项目 · 桌游与系统设计",hero:"用信息、信心与风险经营一座拍卖帝国。",summary:"玩家经营彼此竞争的拍卖行，在时间和资源有限的市场中收购藏品、鉴定真伪、设定估价并举办高风险拍卖。每件拍品都可能隐藏秘密，每一次举牌都可能改变市场价值与玩家关系。",concept:"一款融合竞价拍卖、古董鉴定与拍卖行经营的策略桌游。玩家既要像商人一样评估价值，也要像拍卖师一样掌控局面，同时应对赝品、私人信息与价格操纵。",
+solo:"个人项目 · 桌游与系统设计",hero:"用信息、信心与风险经营一座拍卖帝国。",summary:"玩家经营彼此竞争的拍卖行，在时间和资源有限的市场中收购藏品、鉴定真伪、设定估价并举办高风险拍卖。每件拍品都可能隐藏秘密，每一次举牌都可能改变市场价值与玩家关系。",concept:"一款融合竞价拍卖、古董鉴定与拍卖行经营的策略桌游。玩家既要像商人一样评估价值，也要像拍卖师一样掌控局面，同时应对赝品、私人信息与价格操纵。",video:"玩法视频",watch:"前往 YOUTUBE 观看 ↗",
 inspiration:"设计灵感",inspirationText:"项目结合了三种古董体验：上海灵石路夜市中的议价与不确定价格、Christie’s 的专业估值与受控竞争，以及中国文物鉴定节目中真伪揭晓带来的悬念与情绪反应。",
 loop:"核心玩法",loopText:"古董会公开类别、稀有度和起拍价值，但真实品质保持隐藏。玩家进行鉴定、讨论、诈唬与竞价，再管理收藏和资源，直至最终结算时公开所有秘密。",
 gameplay:"拍卖流程",gameplayText:"每场拍卖都把不完整信息转化为社交判断与财务决策。",
@@ -75,6 +75,7 @@ const card=(h,p,file)=>`<article class="hm-component">${media(file,h)}<div><h4>$
 const list=items=>`<ul class="hm-list">${items.map(x=>`<li>${x}</li>`).join("")}</ul>`
 function build(lang){const c=copy[lang];return `<section class="hm" data-lang="${lang}">
 <section class="hm-hero"><div><span>${c.solo}</span><h3>${c.hero}</h3><p>${c.summary}</p><p class="hm-concept">${c.concept}</p><div class="hm-facts"><b>3–4 PLAYERS</b><b>24 ANTIQUES</b><b>9 IDENTITIES</b><b>2026</b></div></div>${media("antique-board.png","Time Collector antique collection")}</section>
+<section class="hm-video"><span>${c.video}</span><div class="hm-video-frame"><iframe src="https://www.youtube-nocookie.com/embed/-ZYleaork3k" title="Time Collector gameplay video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><a href="https://youtu.be/-ZYleaork3k" target="_blank" rel="noreferrer">${c.watch}</a></section>
 ${title("01",c.inspiration,c.inspirationText)}${media("inspiration.png",c.inspiration,"wide")}
 ${title("02",c.loop,c.loopText)}<div class="hm-loop">${[c.appraise,c.gameplay,c.components,c.score].map((x,i)=>`<div><span>0${i+1}</span><b>${x}</b></div>`).join("")}</div>${media("game-flow.png",c.loop,"flow")}
 ${title("03",c.gameplay,c.gameplayText)}<div class="hm-steps">${card(c.auctioneer,c.auctioneerText,"auctioneer.png")}${card(c.appraise,c.appraiseText,"appraisal-play.png")}${card(c.bid,c.bidText,"bid-pass.png")}${card(c.pawn,c.pawnText,"pawn-play.png")}</div>${card(c.score,c.scoreText,"final-scoring.png")}

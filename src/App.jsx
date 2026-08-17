@@ -26,7 +26,7 @@ const zh={
   "DESIGN TOOLKIT":"设计工具箱","Skills & software":"技能与软件","Design":"设计","Engines & Code":"引擎与代码","Creative Tools":"创作工具","Level Design":"关卡设计","Game Systems":"游戏系统","UI/UX Design":"UI/UX 设计","Prototyping":"原型制作","Playtesting":"试玩测试","LET'S CONNECT":"保持联系","Interested in working":"期待一起","together?":"合作吗？","I am open to internships, collaborative projects and conversations about game and level design.":"我愿意参与实习、合作项目，以及关于游戏与关卡设计的交流。","Artwork by the team's artist":"画面由团队美术制作","COMPLETE PROJECT BOARDS":"完整作品排版","PROJECT BOARD":"作品排版","The complete presentation is included at the end as an archive of the team's full project documentation.":"完整排版作为团队项目文档的档案展示，统一放在介绍末尾。","BACK TO TOP ↑":"返回顶部 ↑"
 }
 Object.assign(zh,{
-  "TEAM PROJECT · MY ROLE: LEVEL DESIGN":"团队作业 · 我担任关卡设计",
+  "OPEN-WORLD EXPLORATION & COMEDY GAME · TEAM PROJECT · LEVEL DESIGN":"开放世界探索喜剧游戏 · 团队项目 · 关卡设计",
   "SEND A SUGGESTION":"发送建议","Your name":"你的名字","Your email":"你的邮箱","Your suggestion":"你的建议","Send suggestion":"发送建议","Suggestions are delivered directly to my email.":"建议会直接发送到我的邮箱。",
   "VIEW RESUME":"查看简历","DOWNLOAD RESUME":"下载简历",
   "Glowing jerky creates a visible destination and communicates the collection goal from a distance.":"发光肉干形成可见目的地，并从远处传达收集目标。",
@@ -226,7 +226,7 @@ export default function App(){
   const [hoveredVideo,setHoveredVideo]=useState(null)
   const tr=text=>lang==="zh"?(zh[text]||text):text
   const localizedProjects=projects.map(project=>localize(project,lang)).map(project=>{
-    if(project.id==="dog") return {...project,type:tr("TEAM PROJECT · MY ROLE: LEVEL DESIGN")}
+    if(project.id==="dog") return {...project,type:tr("OPEN-WORLD EXPLORATION & COMEDY GAME · TEAM PROJECT · LEVEL DESIGN")}
     if(project.id==="hammer") return {...project,title:"BEFORE THE HAMMER FALLS"}
     return project
   })

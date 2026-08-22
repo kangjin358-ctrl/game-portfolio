@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react"
 
+const assetPath = path => path?.startsWith('/') ? `${import.meta.env.BASE_URL}${path.slice(1)}` : path
+const prefixAssetPaths = value => {
+  if (Array.isArray(value)) return value.map(prefixAssetPaths)
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key,item])=>[key,prefixAssetPaths(item)]))
+  return typeof value === 'string' ? assetPath(value) : value
+}
+
 const zh={
   "Psychological Horror Game":"心理恐怖游戏","UI/UX & Game Designer":"UI/UX 与游戏设计师","Open-world Exploration & Comedy Game":"开放世界探索喜剧游戏","Level Designer":"关卡设计师","Auction & Bluffing Board Game":"拍卖与诈唬桌游","Game & System Designer":"游戏与系统设计师","AR Tactical Strategy Game":"AR 战术策略游戏","Game Designer & Programmer":"游戏设计师与程序员",
   "A first-person psychological horror prototype set inside a shifting house. Players search for five missing objects, read changes in light and sound, and evade a roaming presence while trying to break an endless spatial loop.":"一款发生在不断变化住宅中的第一人称心理恐怖原型。玩家需要寻找五件遗失物品，从光线与声音的变化中判断危险，并躲避游荡的存在，尝试打破无尽的空间循环。",
@@ -229,7 +236,7 @@ export default function App(){
     if(project.id==="dog") return {...project,type:tr("OPEN-WORLD EXPLORATION & COMEDY GAME · TEAM PROJECT · LEVEL DESIGN")}
     if(project.id==="hammer") return {...project,title:"BEFORE THE HAMMER FALLS"}
     return project
-  })
+  }).map(prefixAssetPaths)
   const previewVideoSrc=(url,playing)=>`${url}${url.includes("?")?"&":"?"}mute=1&controls=0&playsinline=1&rel=0${playing?"&autoplay=1":""}`
   useEffect(()=>{document.documentElement.lang=lang==="zh"?"zh-CN":"en"},[lang])
   return <div className="site">

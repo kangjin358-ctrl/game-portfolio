@@ -2,7 +2,9 @@
 const copy={
 en:{solo:'SOLO PROJECT · GAME DESIGN / LEVEL DESIGN / BLUEPRINT',intro:'Trapped inside a shifting cabin, the player must recover five keys, read changes in light and sound, avoid a roaming presence, and break an endless spatial loop.',inspiration:'The project began with a dream about a bored ghost trapped in a dark house. The player enters by mistake and becomes its new playmate unless they can collect the keys and escape.',design:'DESIGN PILLARS',flow:'PLAYER FLOW',level:'LEVEL DESIGN · FROM PLAN TO PLAYABLE SPACE',systems:'GAMEPLAY & TECHNICAL SYSTEMS',testing:'PLAYTEST · FINDING THE REAL PROBLEMS',crt:'TECHNICAL ART · CRT POST PROCESS',boards:'COMPLETE PROJECT BOARDS',boardsText:'The original presentation boards are kept as an archive at the very end. The case study above separates evidence and explanation for easier reading.',reflection:'CURRENT OUTCOME & REFLECTION'},
 zh:{solo:'个人独立项目 · 游戏设计 / 关卡设计 / 蓝图实现',intro:'玩家被困在不断变化的木屋中，需要寻找五把钥匙，从光线与声音的变化中判断危险，避开游荡的怪物，并打破无尽的空间循环。',inspiration:'项目源于一个梦：一只被困在黑暗房屋里的幽灵因为无聊，想抓住误入者作为新的玩伴。玩家必须收集钥匙并逃离。',design:'核心设计支柱',flow:'玩家流程',level:'关卡设计 · 从平面草图到可玩空间',systems:'玩法与技术系统',testing:'试玩测试 · 找到真正的问题',crt:'技术美术 · CRT 后处理',boards:'完整作品排版',boardsText:'原始完整排版作为项目档案统一放在介绍末尾；上方案例采用独立图片与网页原生文字，方便阅读。',reflection:'当前成果与反思'}};
-const img=(src,alt)=>`<figure class="fr-media"><img loading="lazy" src="${src}" alt="${alt}"></figure>`;
+const basePath=new URL('.',document.currentScript.src).pathname;
+const asset=src=>`${basePath}${src.replace(/^\/+/, '')}`;
+const img=(src,alt)=>`<figure class="fr-media"><img loading="lazy" src="${asset(src)}" alt="${alt}"></figure>`;
 const pair=(a,b)=>`<div class="fr-pair">${a}${b}</div>`;
 const section=(k,title,body)=>`<section class="fr-section"><span class="fr-kicker">${k}</span><h3>${title}</h3>${body}</section>`;
 function build(zh){const t=copy[zh?'zh':'en'];return `<div class="fr" data-lang="${zh?'zh':'en'}">

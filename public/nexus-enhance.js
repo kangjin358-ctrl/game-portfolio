@@ -19,7 +19,9 @@ const systems=[
 ["RegionBuff","Applies Fire damage, Water reduction and Wood regeneration inside trigger regions.","在触发区域施加火焰增伤、水域减伤与木属性恢复。",null],
 ["GameResultManager","Controls timer, win or loss checks, result UI and restart state.","控制计时、胜负判断、结果界面与重开状态。",null],
 ["Billboard","Keeps world-space health bars and labels facing the AR camera.","让世界空间生命条与名称始终朝向 AR 相机。",null]]
-const img=(src,alt)=>'<img loading="lazy" src="'+src+'" alt="'+alt+'">'
+const basePath=new URL('.',document.currentScript.src).pathname;
+const asset=src=>basePath+src.replace(/^\/+/, '')
+const img=(src,alt)=>'<img loading="lazy" src="'+asset(src)+'" alt="'+alt+'">'
 function build(lang){const c=nxCopy[lang],z=lang==="zh",t=(a,b)=>z?b:a
 return '<section class="nx" data-lang="'+lang+'">'+
 '<div class="nx-hero"><div><span class="nx-eyebrow">'+t('AR · TACTICAL CARDS · AUTO BATTLE','AR · 战术卡牌 · 自动战斗')+'</span><h3>'+c.hero+'</h3><p>'+c.intro+'</p><p class="nx-insight">'+c.insight+'</p><div class="nx-facts"><b>'+t('10×10 GRID','10×10 网格')+'</b><b>'+t('3 ELEMENTS','3 种元素')+'</b><b>'+t('5 LEVELS','5 个关卡')+'</b><b>'+t('AR MOBILE','移动端 AR')+'</b></div></div>'+img("/nexus-cards-poster.webp","NEXUS CARDS AR battlefield")+'</div>'+

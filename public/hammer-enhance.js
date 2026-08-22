@@ -68,7 +68,8 @@ reflection:"反思",reflectionText:"项目最初只是一个隐藏价值拍卖�
 future:"未来计划",futureText:"我计划扩充身份卡，并测试有限选择的身份抽取方式。玩家不再接受完全随机的角色，而是从少量身份中选择。后续试玩将确定合适的可选数量，在自主性、设置时间与策略变化之间取得平衡。",
 open:"公开信息",hidden:"隐藏信息",quality:"品质与真伪",trend:"当前市场趋势",identity:"对手身份",private:"私人鉴定结果"
 }}
-const path=n=>`/hammer/${n}`
+const basePath=new URL('.',document.currentScript.src).pathname;
+const path=n=>`${basePath}hammer/${n}`
 const media=(file,alt,cls="")=>`<figure class="hm-media ${cls}"><img loading="lazy" src="${path(file)}" alt="${alt}"></figure>`
 const title=(n,h,p="")=>`<header class="hm-title"><span>${n}</span><h3>${h}</h3>${p?`<p>${p}</p>`:""}</header>`
 const card=(h,p,file)=>`<article class="hm-component">${media(file,h)}<div><h4>${h}</h4><p>${p}</p></div></article>`

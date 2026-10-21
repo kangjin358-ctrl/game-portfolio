@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react"
 
+function videoEmbedSrc(url, preview = false) {
+  const videoId = url.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?v=|embed\/))([^?&/]+)/)?.[1]
+  if (!videoId) return url
+  const params = new URLSearchParams({ playsinline: "1", rel: "0" })
+  if (preview) {
+    Object.entries({ autoplay: "1", mute: "1", controls: "0", loop: "1", playlist: videoId }).forEach(([key, value]) => params.set(key, value))
+  }
+  return `https://www.youtube-nocookie.com/embed/${videoId}?${params}`
+}
+
 const assetPath = path => path?.startsWith('/') ? `${import.meta.env.BASE_URL}${path.slice(1)}` : path
 const prefixAssetPaths = value => {
   if (Array.isArray(value)) return value.map(prefixAssetPaths)
@@ -204,7 +214,7 @@ function ProjectModal({project,close,tr}){
     <button className="modal-close" onClick={close} aria-label="Close project">×</button><span className="kicker">{project.role} · {project.year}</span>
     {project.logo?<img className="modal-logo" src={project.logo} alt="Before the Hammer Falls"/>:<h2>{project.title}</h2>}
     <p className="modal-type">{project.type}</p><p className="modal-lead">{project.description}</p><ToolIcons tools={project.tools}/>
-    {project.video&&project.id!=="hammer"&&<section className="project-video"><span className="kicker">{tr("GAMEPLAY VIDEO")}</span><div className="video-frame"><iframe src={project.video} title="DOG OF WAR gameplay video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen/></div><a href="https://youtu.be/lzq0yxkVw1U" target="_blank" rel="noreferrer">{tr("Watch on YouTube ↗")}</a></section>}
+    {project.video&&project.id!=="hammer"&&<section className="project-video"><span className="kicker">{tr("GAMEPLAY VIDEO")}</span><div className="video-frame"><iframe src={videoEmbedSrc(project.video)} title={`${project.title} gameplay video`} referrerPolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen/></div><a href={project.video} target="_blank" rel="noreferrer">{tr("Watch on YouTube ↗")}</a></section>}
     <h3>{tr("My contribution")}</h3><ul>{project.contributions.map(item=><li key={item}>{item}</li>)}</ul>
     {project.teamContributions&&<section className="team-contributions"><span className="kicker">{tr("TEAM CONTRIBUTIONS")}</span><div className="case-grid">{project.teamContributions.map(item=><article key={item.name}><span className="credit-role">{item.role}</span><h4>{item.name}</h4><p>{item.text}</p></article>)}</div></section>}
     {project.id==="dog"?<DogCaseStudy project={project} tr={tr}/>:project.challenge&&<div className="case-study">
@@ -238,8 +248,7 @@ export default function App(){
     return project
   }).map(prefixAssetPaths)
   const previewVideoSrc=url=>{
-    const videoId=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^?&/]+)/)?.[1]
-    return videoId?`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&playsinline=1&loop=1&playlist=${videoId}&rel=0`:url
+    return videoEmbedSrc(url, true)
   }
   useEffect(()=>{document.documentElement.lang=lang==="zh"?"zh-CN":"en"},[lang])
   return <div className="site">

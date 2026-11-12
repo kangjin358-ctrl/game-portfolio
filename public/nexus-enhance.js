@@ -38,5 +38,5 @@ title("04",c.systems)+
 '<div class="nx-logic"><span>COMBAT LOOP</span><b>StartGame</b><i>→</i><b>Countdown</b><i>→</i><b>Check Teams</b><i>→</i><b>Victory / Defeat</b><i>→</i><b>Reset</b></div>'+
 '<header class="nx-title nx-outcome"><span>05</span><h3>'+c.outcome+'</h3><p>'+c.result+'</p></header></section>'}
 function title(n,h,p=""){return '<header class="nx-title"><span>'+n+'</span><h3>'+h+'</h3>'+(p?'<p>'+p+'</p>':"")+'</header>'}
-function update(){const modal=document.querySelector(".modal-element");if(!modal)return;const lang=(modal.querySelector(".modal-type")?.textContent||"").includes("策略")?"zh":"en";const old=modal.querySelector(".nx");if(old?.dataset.lang===lang)return;if(old)old.remove();modal.insertAdjacentHTML("beforeend",build(lang))}
+function update(){const modal=document.querySelector(".modal-element");if(!modal)return;const lang=(modal.querySelector(".modal-type")?.textContent||"").includes("策略")?"zh":"en";const old=modal.querySelector(".nx");if(old?.dataset.lang===lang)return;if(old)old.remove();const boards=modal.querySelector(".nexus-boards");if(boards)boards.insertAdjacentHTML("beforebegin",build(lang));else modal.insertAdjacentHTML("beforeend",build(lang))}
 new MutationObserver(update).observe(document.body,{childList:true,subtree:true,characterData:true});update();

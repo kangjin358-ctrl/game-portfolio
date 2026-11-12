@@ -163,5 +163,13 @@
 }
 
 
+.nexus-boards{margin:48px 0}
+.nexus-boards-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.nexus-boards-heading p{font-size:12px;color:#486365;margin:0}
+.nexus-boards figure{margin:0 0 28px}
+.nexus-boards a{display:block;cursor:zoom-in}
+.nexus-boards img{display:block;width:100%;height:auto}
+.nexus-boards figcaption{text-align:right;margin-top:8px;font:11px 'DM Mono',monospace;color:#486365}
+
 /* Temporarily hide the Fantasy Room testing board */
 .case-image:has(>img[src$="/the-monastery/testing.webp"]){display:none!important}
